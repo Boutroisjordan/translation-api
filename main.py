@@ -23,11 +23,11 @@ def translate():
     response = ollama.chat(model='llama3', messages=[
         {
             'role': 'user',
-            'content': f'Translate literally in {outlang} this text: "{content}". The return type should be in JSON format with'
-                       f' the key "content" and the value the translated text. You must define whether the text is'
-                       ' explicit or not and the language of the text. This is an example: {"content": "There is nothing '
-                       'suitable", "explicit": false, "inLang": "Japanese", "outLang: "English"}. Type your response'
-                       ' as a JSON and don\'t write anything else.',
+            'content': f'Translate in {outlang} this: "{content}". The return type should be in JSON format with'
+                       ' the key "content" and the value the translated text. You must define whether the text is'
+                       ' explicit or not and the language of the text. Example: {"content": the translation, '
+                       '"explicit": if the text seems explicit (true/false), "inLang": language you detected (ja), '
+                       '"outLang": given outlang (fr)}. Type your response as a JSON and don\'t write anything else.',
         },
     ])
     print(response['message']['content'])
