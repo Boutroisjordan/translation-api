@@ -20,7 +20,7 @@ def llama():
 def translate():
     content = flask.request.json['content']
     outlang = flask.request.json['outLang']
-    response = ollama.chat(model='llama3', messages=[
+    response = ollama.chat(model='mistral', messages=[
         {
             'role': 'user',
             'content': f'Translate in {outlang} this: "{content}". The return type should be in JSON format with'
