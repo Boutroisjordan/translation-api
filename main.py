@@ -1,39 +1,15 @@
-import flask, ollama
-from flask import make_response
-from flask_cors import cross_origin, CORS
+import ollama
+from flask import Flask, request
+from flask_cors import CORS
 
-app = flask.Flask(__name__)
-app.config["DEBUG"] = True
-cors = CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["POST", "OPTIONS"]}})
-
-class middleware():
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        if environ['REQUEST_METHOD'] == 'OPTIONS':
-            start_response(
-                '200 OK',
-                [
-                    ('Content-Type', 'text/plain'),
-                    ('Content-Length', '0'),
-                    ('Access-Control-Allow-Origin', '*'),
-                    ('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'),
-                    ('Access-Control-Allow-Headers', 'Content-Type'),
-                    ('Access-Control-Max-Age', '86400'),
-                ]
-            )
-        return self.app(environ, start_response)
-
-
-app.wsgi_app = middleware(app.wsgi_app)
+app = Flask(__name__)
+CORS(app)
 
 
 @app.route("/api/translate", methods=["POST"])
-@cross_origin()
 def translate():
-    content = flask.request.json['content']
-    outlang = flask.request.json['outLang']
+    content = request.json['content']
+    outlang = request.json['outLang']
     result = ollama.chat(model='mistral', messages=[
         {
             'role': 'user',
@@ -49,45 +25,5 @@ def translate():
     return result['message']['content']
 
 
-
-@app.route('/llama3', methods=['GET'])
-def llama():
-    response = ollama.chat(model='llama3', messages=[
-        {
-            'role': 'user',
-            'content': 'Translate in englsih this and response in json: 向いているものはありません',
-        },
-    ])
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    print(response['message']['content'])
-    return response['message']['content']
-
-
-@app.route('/lang', methods=['GET'])
-def getlang():
-    response = ollama.chat(model='llama3', messages=[
-        {
-            'role': 'user',
-            'content': 'Give me the langage of the next sentence juste respond in JSON format "language": the name of '
-                       'the language and "code": two first letter of langage or diminutif (like en for english or fr '
-                       'for french) : 向いているものはありません',
-        },
-    ])
-    print(response['message']['content'])
-    return response['message']['content']
-
-
-@app.route('/explicit', methods=['GET'])
-def explicit():
-    response = ollama.chat(model='llama3', messages=[
-        {
-            'role': 'user',
-            'content': 'Is the next text explicit content or bad wors, response only by true false et the type of '
-                       'explicit content all in a json:  Stupid mother fucker, suck my big dick and kill ur self',
-        },
-    ])
-    print(response['message']['content'])
-    return response['message']['content']
-
-
-app.run()
+if __name__ == '__main__':
+    app.run(debug=True)
